@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Book a haircut, fade, shave or beard trim at Kettle Street Barbers.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Kettle Street Barbers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Public+Sans:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: sticky shop bar; tiled sign band with the next open chair; a two-column booking desk
+   (steps left, paper appointment card right); barbers; visit info. On phones the desk stacks
+   and a bottom bar keeps the booking button within reach. */
+:root {
+  --tile: #E2ECE5;        /* mint shop tile */
+  --grout: #CCDCD2;
+  --paper: #F8FAF5;       /* appointment card stock */
+  --ink: #1C3A30;         /* bottle-green ink */
+  --ink-soft: #4E695F;
+  --rule: #B6CABF;
+  --booked: #CFDDD5;
+  --oxblood: #8A2433;     /* pomade-tin red */
+  --on-oxblood: #FFF7F4;
+  --focus: #1F6FB2;
+  --font-sign: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --bar-h: 60px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tile: #0F1F1A; --grout: #18302835; --paper: #172C25; --ink: #DCEBE3; --ink-soft: #94B0A5;
+    --rule: #2F4B41; --booked: #22392F; --oxblood: #E06A78; --on-oxblood: #2A0A10;
+    --focus: #7DB8EC; --grout: #1A3029; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --tile: #0F1F1A; --paper: #172C25; --ink: #DCEBE3; --ink-soft: #94B0A5;
+  --rule: #2F4B41; --booked: #22392F; --oxblood: #E06A78; --on-oxblood: #2A0A10;
+  --focus: #7DB8EC; --grout: #1A3029; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--tile); color: var(--ink);
+  font: 400 1rem/1.55 var(--font-body);
+  padding-block: 0;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--ink); }
+.gutter {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; }
+[id] { scroll-margin-top: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 16px); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -60px; z-index: 40; background: var(--paper); color: var(--ink); padding: 10px 14px; border-radius: 4px; font-weight: 600; }
+.skip:focus { top: calc(env(safe-area-inset-top, 0px) + 8px); }
+
+/* Top bar */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--ink); color: var(--tile); }
+.topbar .wrap { display: flex; align-items: center; gap: 20px; height: var(--bar-h); }
+.wordmark { font-family: var(--font-sign); font-weight: 900; font-size: 1.45rem; text-transform: uppercase; letter-spacing: .04em; color: inherit; text-decoration: none; white-space: nowrap; }
+.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav a { color: inherit; text-decoration: none; font-weight: 500; font-size: .95rem; padding: 8px 10px; border-radius: 4px; }
+.nav a:hover { background: color-mix(in srgb, var(--tile) 14%, transparent); }
+.nav a[aria-current="true"] { box-shadow: inset 0 -2px 0 var(--tile); border-radius: 0; }
+.nav .nav-cta { background: var(--tile); color: var(--ink); font-weight: 700; margin-left: 6px; border-radius: 4px; }
+.nav .nav-cta:hover { background: var(--paper); }
+@media (max-width: 560px) {
+  .nav a:not(.nav-cta) { display: none; }
+}
+
+/* Sign band */
+.signband {
+  border-bottom: 2px solid var(--ink);
+  background-color: var(--tile);
+  background-image:
+    linear-gradient(var(--grout) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--grout) 1.5px, transparent 1.5px);
+  background-size: 36px 36px;
+  background-position: -1px -1px;
+}
+.sign { padding-block: 48px 36px; display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); align-items: end; }
+.sign h1 {
+  margin: 0; font-family: var(--font-sign); font-weight: 900;
+  font-size: clamp(3.4rem, 11vw, 7.8rem); line-height: .82; text-transform: uppercase;
+}
+.sign h1 span { display: block; font-weight: 600; font-size: .36em; letter-spacing: .1em; margin-top: .45em; color: var(--ink-soft); }
+.nextbox { background: var(--paper); border: 1.5px solid var(--ink); border-radius: 4px; padding: 16px 18px; display: grid; gap: 10px; box-shadow: 4px 4px 0 var(--ink); }
+.nextbox p { margin: 0; }
+.nextbox .lbl { font-size: .9rem; color: var(--ink-soft); }
+.nextbox .when { font-family: var(--font-hand); font-size: 2rem; line-height: 1; color: var(--oxblood); font-weight: 700; }
+.nextbox .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.link { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+
+/* Buttons */
+.btn { font: 700 1rem var(--font-body); padding: 12px 16px; border-radius: 4px; cursor: pointer; border: 1.5px solid transparent; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary { background: var(--oxblood); color: var(--on-oxblood); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-primary:disabled { background: var(--booked); color: var(--ink-soft); cursor: not-allowed; filter: none; }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn-ghost:hover { background: var(--tile); }
+
+/* Desk */
+.desk { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 48px; padding-block: 40px 56px; align-items: start; }
+.steps { display: grid; gap: 48px; min-width: 0; }
+.step-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+.step-head .n {
+  flex: none; width: 2rem; height: 2rem; border-radius: 50%; margin-top: 2px;
+  display: grid; place-items: center; border: 2px solid var(--ink); font-weight: 700; font-size: .95rem;
+}
+.step[data-done] .n { background: var(--ink); color: var(--tile); }
+.step-head h2 { font-family: var(--font-sign); font-weight: 800; font-size: 2.1rem; line-height: 1; margin: 0; }
+.step-head .sum { display: block; margin-top: 6px; font-size: .92rem; color: var(--ink-soft); }
+.hint { margin: 0 0 14px; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
+
+/* Services: a price board */
+.services { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.services li { border-bottom: 1px solid var(--rule); }
+.services label {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; gap: 14px; align-items: baseline;
+  padding: 14px 10px; cursor: pointer;
+}
+.services label:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }
+.services input { accent-color: var(--oxblood); width: 18px; height: 18px; transform: translateY(3px); }
+.svc-name { font-weight: 600; }
+.svc-name small { display: block; font-weight: 400; color: var(--ink-soft); font-size: .86rem; }
+.svc-time { color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.svc-price { font-family: var(--font-sign); font-weight: 800; font-size: 1.55rem; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
+.services li:has(input:checked) { background: var(--paper); box-shadow: inset 4px 0 0 var(--oxblood); }
+.services li:has(input:checked) .svc-price { color: var(--oxblood); }
+
+/* Pickers */
+.pickrow { display: grid; gap: 8px; margin-bottom: 14px; }
+.pickrow > span { font-size: .88rem; font-weight: 600; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; }
+.chip {
+  flex: none; padding: 8px 12px; border: 1.5px solid var(--rule); border-radius: 6px;
+  background: var(--paper); color: var(--ink); font: inherit; font-size: .92rem; font-weight: 500; cursor: pointer; line-height: 1.15;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.chip:hover { border-color: var(--ink-soft); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--tile); border-color: var(--ink); }
+.chip:disabled { opacity: .45; cursor: not-allowed; text-decoration: line-through; }
+.day { min-width: 64px; flex-direction: column; gap: 0; text-align: center; }
+.day b { font-family: var(--font-sign); font-size: 1.6rem; font-weight: 800; }
+.day small { font-size: .76rem; opacity: .8; }
+
+/* The book */
+.book-scroll { overflow: auto; max-height: min(30rem, 70vh); border: 1.5px solid var(--ink); border-radius: 4px; background: var(--paper); }
+.book { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 300px; font-variant-numeric: tabular-nums; }
+.book thead th { position: sticky; top: 0; z-index: 1; background: var(--paper); box-shadow: inset 0 -1.5px 0 var(--ink); font-weight: 600; text-align: left; padding: 10px 8px; vertical-align: bottom; }
+.book th small { display: block; font-weight: 400; color: var(--ink-soft); font-size: .8rem; }
+.book .time { width: 64px; color: var(--ink-soft); font-size: .85rem; font-weight: 500; }
+.book td { border-top: 1px solid var(--rule); padding: 0; height: 40px; }
+.book tbody tr:first-child td { border-top: 0; }
+.book td.time { padding: 0 8px; }
+.book tr.hour td { border-top-color: var(--ink-soft); }
+.book td + td, .book th + th { border-left: 1px solid var(--rule); }
+.slot {
+  width: 100%; height: 100%; min-height: 40px; border: 0; background: transparent; color: var(--ink-soft);
+  font: inherit; font-size: .85rem; cursor: pointer; text-align: left; padding: 0 10px;
+}
+.slot:hover { background: var(--tile); color: var(--ink); font-weight: 600; }
+.cell-booked { background: repeating-linear-gradient(135deg, var(--booked) 0 6px, transparent 6px 11px); }
+.cell-past { background: var(--tile); }
+.cell-picked { background: var(--oxblood); }
+.cell-picked .slot { color: var(--on-oxblood); font-family: var(--font-hand); font-size: 1.3rem; font-weight: 700; }
+.cell-picked .slot:hover { background: transparent; }
+.legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: .84rem; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--rule); border-radius: 2px; }
+.empty-day { padding: 28px 18px; color: var(--ink-soft); margin: 0; }
+.picked-bar { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--paper); border: 1.5px solid var(--oxblood); border-radius: 4px; }
+.picked-bar p { margin: 0; font-weight: 600; }
+
+/* Avatars */
+.barber { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.who { min-width: 0; }
+.avatar {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+  display: inline-grid; place-items: center;
+  background: var(--tile); color: var(--ink-soft); border: 1.5px dashed var(--ink-soft);
+  font-family: var(--font-sign); font-weight: 800; font-size: 1.15rem; letter-spacing: .03em;
+}
+img.avatar { border-style: solid; border-color: var(--ink); }
+.chip .avatar { width: 24px; height: 24px; font-size: .72rem; border-width: 1px; }
+.chip[aria-pressed="true"] .avatar { background: var(--tile); }
+
+/* Details */
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 640px; }
+.fields .full { grid-column: 1 / -1; }
+.field { display: grid; gap: 6px; align-content: start; }
+.field label { font-weight: 600; font-size: .92rem; }
+.field label small { font-weight: 400; color: var(--ink-soft); }
+.field input, .field textarea {
+  font: inherit; color: var(--ink); background: var(--paper); border: 1.5px solid var(--rule); border-radius: 4px; padding: 11px 12px; width: 100%;
+}
+.field input:hover, .field textarea:hover { border-color: var(--ink-soft); }
+.field input:focus, .field textarea:focus { border-color: var(--ink); }
+.field textarea { min-height: 80px; resize: vertical; }
+.field[data-error] input { border-color: var(--oxblood); }
+.err { color: var(--oxblood); font-size: .85rem; font-weight: 500; }
+
+/* Appointment card */
+.card-col { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 20px); display: grid; gap: 14px; }
+.card { background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; padding: 18px 20px 20px; position: relative; box-shadow: 4px 4px 0 var(--ink); }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.5px solid var(--ink); padding-bottom: 8px; margin-bottom: 6px; }
+.card-head b { font-family: var(--font-sign); font-weight: 900; font-size: 1.35rem; text-transform: uppercase; letter-spacing: .04em; }
+.card-head small { color: var(--ink-soft); font-size: .8rem; }
+.card dl { margin: 0; display: grid; }
+.card .row { display: grid; grid-template-columns: 78px minmax(0, 1fr); align-items: end; gap: 8px; border-bottom: 1px dashed var(--rule); padding: 6px 0 2px; min-height: 42px; }
+.card dt { font-size: .82rem; color: var(--ink-soft); padding-bottom: 6px; }
+.card dd { margin: 0; font-family: var(--font-hand); font-size: 1.6rem; line-height: 1.1; font-weight: 500; overflow-wrap: anywhere; }
+.card dd.blank { color: var(--rule); }
+.card .total dd { color: var(--oxblood); font-weight: 700; }
+.stamp {
+  position: absolute; right: 14px; top: 58px; transform: rotate(-9deg);
+  border: 3px solid var(--oxblood); color: var(--oxblood); border-radius: 6px;
+  font-family: var(--font-sign); font-weight: 900; font-size: 2.2rem; letter-spacing: .06em; text-transform: uppercase;
+  padding: 0 12px; line-height: 1.15; opacity: .9;
+}
+.stamp:not([hidden]) { animation: stamp .35s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes stamp { from { transform: rotate(-9deg) scale(2.2); opacity: 0; } to { transform: rotate(-9deg) scale(1); opacity: .9; } }
+@media (prefers-reduced-motion: reduce) { .stamp:not([hidden]) { animation: none; } }
+.card-col .btn { width: 100%; padding-block: 15px; }
+.missing { font-size: .86rem; color: var(--ink-soft); margin: 0; }
+.done-note { margin: 0; font-size: .95rem; }
+.policy { font-size: .82rem; color: var(--ink-soft); margin: 0; }
+
+/* Barbers */
+.band { border-top: 2px solid var(--ink); padding-block: 48px; }
+.band h2 { font-family: var(--font-sign); font-weight: 800; font-size: 2.6rem; line-height: 1; margin: 0 0 24px; }
+.crew { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.person { display: grid; gap: 10px; align-content: start; }
+.person .avatar { width: 96px; height: 96px; font-size: 2rem; border-width: 2px; }
+.person h3 { margin: 4px 0 0; font-size: 1.15rem; }
+.person .meta { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+.person p { margin: 0; max-width: 40ch; }
+.person .btn { justify-self: start; margin-top: 4px; padding: 9px 14px; font-size: .92rem; }
+
+/* Visit */
+.visit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.visit h3 { margin: 0 0 8px; font-size: 1rem; }
+.visit p { margin: 0 0 6px; max-width: 46ch; }
+.hours { border-collapse: collapse; font-variant-numeric: tabular-nums; width: 100%; max-width: 340px; }
+.hours td { padding: 7px 0; border-bottom: 1px solid var(--rule); }
+.hours td:last-child { text-align: right; }
+.hours tr[data-today] td { font-weight: 700; }
+.hours tr[data-today] td:first-child::after { content: " (today)"; font-weight: 400; color: var(--ink-soft); }
+.phone-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.phone-row span { font-weight: 600; font-size: 1.1rem; user-select: all; }
+.phone-row button { padding: 6px 10px; font-size: .85rem; }
+footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; border-top: 1px solid var(--rule); }
+
+/* Phone bottom bar */
+.mbar { display: none; }
+
+@media (max-width: 860px) {
+  .desk { grid-template-columns: 1fr; gap: 36px; }
+  .card-col { position: static; }
+  .sign { grid-template-columns: 1fr; padding-block: 36px 28px; }
+  .crew { grid-template-columns: 1fr; gap: 28px; }
+  .person { grid-template-columns: 72px minmax(0, 1fr); column-gap: 16px; }
+  .person .avatar { width: 72px; height: 72px; font-size: 1.5rem; grid-row: span 4; }
+  .visit { grid-template-columns: 1fr; gap: 28px; }
+  .mbar {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    gap: 12px; align-items: center; justify-content: space-between;
+    background: var(--paper); border-top: 1.5px solid var(--ink);
+    padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+    transition: transform .2s ease;
+  }
+  .mbar[data-away] { transform: translateY(110%); }
+  .mbar p { margin: 0; font-size: .9rem; line-height: 1.3; min-width: 0; }
+  .mbar p b { display: block; }
+  .mbar .btn { flex: none; padding: 11px 14px; }
+  body { padding-bottom: 84px; }
+}
+@media (max-width: 520px) {
+  .fields { grid-template-columns: 1fr; }
+  .services label { grid-template-columns: 22px minmax(0, 1fr) auto; padding-inline: 6px; }
+  .svc-time { grid-column: 2; grid-row: 2; margin-top: -8px; }
+  .svc-price { grid-column: 3; grid-row: 1; }
+  .book .time { width: 54px; }
+  .slot { padding: 0 6px; }
+  .book .barber { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .book .avatar { width: 36px; height: 36px; font-size: 1rem; }
+}
+</style>
+
+</head>
+<body>
+<a class="skip" href="#book">Skip to booking</a>
+
+<header class="topbar gutter">
+  <div class="wrap">
+    <a class="wordmark" href="#top">Kettle St.</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#book" data-sec="book">Book</a>
+      <a href="#barbers" data-sec="barbers">Barbers</a>
+      <a href="#visit" data-sec="visit">Hours and address</a>
+      <a class="nav-cta" href="#book">Book a chair</a>
+    </nav>
+  </div>
+</header>
+
+<div class="signband gutter" id="top">
+  <div class="wrap sign">
+    <h1>Kettle Street<span>Barbers since 1987</span></h1>
+    <div class="nextbox" aria-live="polite">
+      <p class="lbl" id="nextLbl">Next open chair for a skin fade</p>
+      <p class="when" id="nextWhen">Checking the book…</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="takeNext" type="button">Take this time</button>
+        <a class="link" href="#book">See all times</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="gutter" id="main">
+  <div class="wrap desk" id="book">
+    <div class="steps">
+      <section class="step" id="step1" aria-labelledby="s1">
+        <div class="step-head"><span class="n" id="n1">1</span><div><h2 id="s1">Pick a service</h2><span class="sum" id="sum1"></span></div></div>
+        <ul class="services" id="services"></ul>
+      </section>
+
+      <section class="step" id="step2" aria-labelledby="s2">
+        <div class="step-head"><span class="n" id="n2">2</span><div><h2 id="s2">Pick a barber and a time</h2><span class="sum" id="sum2"></span></div></div>
+        <div class="pickrow"><span id="dayLbl">Day</span><div class="chips" id="days" role="group" aria-labelledby="dayLbl"></div></div>
+        <div class="pickrow"><span id="barberLbl">Barber</span><div class="chips" id="barberChips" role="group" aria-labelledby="barberLbl"></div></div>
+        <p class="hint">Each column is one barber's book for the day. Tap an open time to take it. Striped times are already booked.</p>
+        <div class="book-scroll" id="bookWrap" tabindex="-1"></div>
+        <div class="legend" aria-hidden="true">
+          <span><i style="background:var(--paper)"></i>Open</span>
+          <span><i class="cell-booked"></i>Booked</span>
+          <span><i style="background:var(--oxblood);border-color:var(--oxblood)"></i>Your time</span>
+        </div>
+        <div class="picked-bar" id="pickedBar" hidden>
+          <p id="pickedText"></p>
+          <a class="btn btn-ghost" href="#step3" id="toDetails">Add your details</a>
+        </div>
+      </section>
+
+      <section class="step" id="step3" aria-labelledby="s3">
+        <div class="step-head"><span class="n" id="n3">3</span><div><h2 id="s3">Tell us who's coming in</h2><span class="sum" id="sum3"></span></div></div>
+        <form id="details" class="fields" novalidate>
+          <div class="field" id="f-name">
+            <label for="name">Name</label>
+            <input id="name" name="name" autocomplete="name" value="Jordan Avery">
+          </div>
+          <div class="field" id="f-phone">
+            <label for="phone">Mobile <small>for a text reminder</small></label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 014-2290" aria-describedby="phoneErr">
+            <span class="err" id="phoneErr" hidden></span>
+          </div>
+          <div class="field full">
+            <label for="note">Notes for your barber <small>optional</small></label>
+            <textarea id="note" name="note" placeholder="#2 on the sides, keep length on top, tidy the neckline"></textarea>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <aside class="card-col" id="summary" aria-label="Your appointment">
+      <div class="card">
+        <div class="card-head"><b>Appointment</b><small>Kettle St. Barbers</small></div>
+        <dl>
+          <div class="row"><dt>For</dt><dd id="c-name"></dd></div>
+          <div class="row"><dt>Service</dt><dd id="c-svc"></dd></div>
+          <div class="row"><dt>With</dt><dd id="c-barber"></dd></div>
+          <div class="row"><dt>Day</dt><dd id="c-day"></dd></div>
+          <div class="row"><dt>Time</dt><dd id="c-time"></dd></div>
+          <div class="row total"><dt>Pay in shop</dt><dd id="c-price"></dd></div>
+        </dl>
+        <div class="stamp" id="stamp" hidden>Booked</div>
+      </div>
+      <button class="btn btn-primary" id="bookBtn" type="button" disabled>Book appointment</button>
+      <p class="missing" id="missing" aria-live="polite"></p>
+      <p class="done-note" id="doneNote" role="status" hidden></p>
+      <button class="btn btn-ghost" id="againBtn" type="button" hidden>Book another appointment</button>
+      <p class="policy">Running late? We hold your chair 10 minutes. To cancel or move it, reply to your reminder text.</p>
+    </aside>
+  </div>
+
+  <section class="wrap band" id="barbers" aria-labelledby="barbersH">
+    <h2 id="barbersH">The barbers</h2>
+    <div class="crew" id="crew"></div>
+  </section>
+
+  <section class="wrap band" id="visit" aria-labelledby="visitH">
+    <h2 id="visitH">Hours and address</h2>
+    <div class="visit">
+      <div>
+        <h3>Opening hours</h3>
+        <table class="hours" id="hours"></table>
+      </div>
+      <div>
+        <h3>Find us</h3>
+        <p>214 Kettle Street, between the bakery and the bike shop.</p>
+        <p>Street parking is free after 6 pm and all day Sunday. The 12 bus stops at the corner.</p>
+        <h3 style="margin-top:20px">Call the shop</h3>
+        <div class="phone-row"><span id="shopPhone">(555) 014-7720</span><button class="btn btn-ghost" id="copyPhone" type="button">Copy number</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="gutter"><div class="wrap">Kettle Street Barbers, 214 Kettle Street. Walk-ins welcome when a chair is free.</div></footer>
+
+<div class="mbar" id="mbar" aria-hidden="false">
+  <p id="mbarText"><b>Skin fade, $42</b>Pick a time</p>
+  <a class="btn btn-primary" href="#summary" id="mbarBtn">Review booking</a>
+</div>
+
+<script>
+(() => {
+  const SERVICES = [
+    { id: "cut",   name: "Haircut",                note: "Clipper or scissor, wash and style", mins: 45, price: 38 },
+    { id: "fade",  name: "Skin fade",              note: "Bald to blended, lined up",           mins: 45, price: 42 },
+    { id: "combo", name: "Cut and beard",          note: "Any haircut plus beard shape",        mins: 60, price: 55 },
+    { id: "shave", name: "Hot towel shave",        note: "Straight razor, two towels",          mins: 40, price: 40 },
+    { id: "beard", name: "Beard trim and line-up", note: "Shape, edge, oil",                    mins: 20, price: 20 },
+    { id: "kids",  name: "Kids' cut",              note: "Under 12",                            mins: 30, price: 26 },
+  ];
+  // Profile picture: set `photo` to an image data: URI; until then, initials show.
+  const BARBERS = [
+    { id: "dee",   name: "Dee Okafor",    short: "Dee",   tag: "Fades",            years: 12, bio: "Skin fades, tapers and sharp line-ups. Bring a photo of the cut you want." },
+    { id: "marco", name: "Marco Ruiz",    short: "Marco", tag: "Scissors, shaves", years: 20, bio: "Scissor cuts, longer styles and the hot towel shave. Has run the front chair since 2006." },
+    { id: "sam",   name: "Sam Lindqvist", short: "Sam",   tag: "Beards, kids",     years: 6,  bio: "Beard shaping and patient kids' cuts. Good with first-timers and nervous sitters." },
+  ];
+  const HOURS = { 0: [600, 900], 1: null, 2: [540, 1140], 3: [540, 1140], 4: [540, 1140], 5: [540, 1140], 6: [480, 960] };
+  const STEP = 30;
+
+  const state = { service: "fade", dayKey: null, barber: null, start: null, only: null, booked: false };
+  const mine = new Set();
+
+  const $ = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2, "0");
+  const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const fmtTime = m => { const h = Math.floor(m / 60), mm = m % 60, h12 = ((h + 11) % 12) + 1; return `${h12}:${pad(mm)} ${h < 12 ? "am" : "pm"}`; };
+  const shortTime = m => fmtTime(m).replace(" ", "");
+  const WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const WDL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const initials = n => n.split(" ").map(p => p[0]).join("").slice(0, 2);
+  const avatar = b => b.photo
+    ? `<img class="avatar" src="${b.photo}" alt="">`
+    : `<span class="avatar" aria-hidden="true">${initials(b.name)}</span>`;
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const nowMin = (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
+  const DAYS = Array.from({ length: 10 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return d; });
+  const dayOf = k => DAYS.find(x => keyOf(x) === k);
+  const dayName = d => keyOf(d) === keyOf(today) ? "today" : keyOf(d) === keyOf(DAYS[1]) ? "tomorrow" : `${WDL[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`;
+
+  function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; }
+  const svc = () => SERVICES.find(s => s.id === state.service);
+  const barberOf = id => BARBERS.find(b => b.id === id);
+  const units = () => Math.ceil(svc().mins / STEP);
+
+  function isTaken(day, barber, m) {
+    if (day === keyOf(today) && m < nowMin + 15) return "past";
+    if (mine.has(`${day}|${barber}|${m}`)) return "booked";
+    const busy = { dee: .55, marco: .42, sam: .35 }[barber];
+    return hash(`${day}${barber}${m}`) < busy ? "booked" : null;
+  }
+  function canStart(day, barber, m) {
+    const hrs = HOURS[dayOf(day).getDay()];
+    if (!hrs) return false;
+    for (let i = 0; i < units(); i++) { const t = m + i * STEP; if (t >= hrs[1] || isTaken(day, barber, t)) return false; }
+    return true;
+  }
+  function findNext() {
+    for (const d of DAYS) {
+      const hrs = HOURS[d.getDay()]; if (!hrs) continue;
+      for (let m = hrs[0]; m < hrs[1]; m += STEP)
+        for (const b of BARBERS) if (canStart(keyOf(d), b.id, m)) return { day: keyOf(d), barber: b.id, start: m };
+    }
+    return null;
+  }
+
+  // ---------- services ----------
+  $("services").innerHTML = SERVICES.map(s => `
+    <li><label>
+      <input type="radio" name="service" id="svc-${s.id}" value="${s.id}" ${s.id === state.service ? "checked" : ""}>
+      <span class="svc-name">${s.name}<small>${s.note}</small></span>
+      <span class="svc-time">${s.mins} min</span>
+      <span class="svc-price">$${s.price}</span>
+    </label></li>`).join("");
+  $("services").addEventListener("change", e => {
+    state.service = e.target.value;
+    if (state.start != null && !canStart(state.dayKey, state.barber, state.start)) { state.barber = null; state.start = null; }
+    renderAll();
+  });
+
+  // ---------- day + barber pickers ----------
+  function renderDays() {
+    $("days").innerHTML = DAYS.map((d, i) => {
+      const closed = !HOURS[d.getDay()];
+      const label = i === 0 ? "Today" : i === 1 ? "Tmrw" : WD[d.getDay()];
+      return `<button type="button" class="chip day" data-day="${keyOf(d)}" aria-pressed="${keyOf(d) === state.dayKey}" ${closed ? "disabled" : ""}
+        aria-label="${WDL[d.getDay()]} ${MON[d.getMonth()]} ${d.getDate()}${closed ? ", closed" : ""}">
+        <small>${label}</small><b>${d.getDate()}</b><small>${closed ? "Closed" : MON[d.getMonth()]}</small></button>`;
+    }).join("");
+  }
+  $("days").addEventListener("click", e => {
+    const b = e.target.closest(".day"); if (!b || b.disabled || state.booked) return;
+    state.dayKey = b.dataset.day; state.barber = null; state.start = null;
+    renderAll();
+  });
+
+  function renderBarberChips() {
+    const opts = [{ id: "", label: "All barbers" }, ...BARBERS.map(b => ({ id: b.id, label: b.short, b }))];
+    $("barberChips").innerHTML = opts.map(o => `<button type="button" class="chip" data-only="${o.id}" aria-pressed="${(state.only || "") === o.id}">${o.b ? avatar(o.b) : ""}${o.label}</button>`).join("");
+  }
+  $("barberChips").addEventListener("click", e => {
+    const c = e.target.closest(".chip"); if (!c) return;
+    state.only = c.dataset.only || null;
+    if (state.only && state.barber && state.barber !== state.only && !state.booked) { state.barber = null; state.start = null; }
+    renderAll();
+  });
+
+  // ---------- the book ----------
+  function renderBook() {
+    const d = dayOf(state.dayKey), hrs = HOURS[d.getDay()];
+    const cols = state.only ? BARBERS.filter(b => b.id === state.only) : BARBERS;
+    const slots = []; for (let m = hrs[0]; m < hrs[1]; m += STEP) slots.push(m);
+    const span = new Set(); if (state.start != null) for (let i = 0; i < units(); i++) span.add(state.start + i * STEP);
+
+    let anyOpen = false;
+    const rows = slots.map(m => {
+      const cells = cols.map(b => {
+        if (b.id === state.barber && span.has(m)) {
+          const first = m === state.start;
+          return `<td class="cell-picked"><button type="button" class="slot" data-b="${b.id}" data-m="${state.start}" aria-pressed="true"
+            aria-label="${fmtTime(m)} with ${b.short}, your time. Select again to clear.">${first ? shortTime(m) : ""}</button></td>`;
+        }
+        const taken = isTaken(state.dayKey, b.id, m);
+        if (taken === "booked") return `<td class="cell-booked"><span class="sr">${fmtTime(m)} with ${b.short}, booked</span></td>`;
+        if (taken === "past") return `<td class="cell-past"></td>`;
+        if (!canStart(state.dayKey, b.id, m)) return `<td></td>`;
+        anyOpen = true;
+        return `<td><button type="button" class="slot" data-b="${b.id}" data-m="${m}" aria-label="Take ${fmtTime(m)} with ${b.short}">${shortTime(m)}</button></td>`;
+      }).join("");
+      return `<tr class="${m % 60 === 0 ? "hour" : ""}"><td class="time">${shortTime(m)}</td>${cells}</tr>`;
+    }).join("");
+
+    const who = state.only ? barberOf(state.only).short : "any barber";
+    $("bookWrap").innerHTML = anyOpen || state.start != null ? `
+      <table class="book">
+        <caption class="sr">Open times on ${dayName(d)}</caption>
+        <thead><tr><th class="time" scope="col">Time</th>${cols.map(b => `<th scope="col"><div class="barber">${avatar(b)}<div class="who">${b.short}<small>${b.tag}</small></div></div></th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>` :
+      `<p class="empty-day">There's no ${svc().mins}-minute gap left with ${who} on ${dayName(d)}. Pick another day${state.only ? ", choose All barbers" : ""}, or try a shorter service.</p>`;
+  }
+  $("bookWrap").addEventListener("click", e => {
+    const s = e.target.closest(".slot"); if (!s || state.booked) return;
+    const m = +s.dataset.m, b = s.dataset.b;
+    if (state.barber === b && state.start === m) { state.barber = null; state.start = null; }
+    else { state.barber = b; state.start = m; }
+    renderAll();
+    const again = $("bookWrap").querySelector(`.slot[data-b="${b}"][data-m="${m}"]`); if (again) again.focus();
+  });
+
+  // ---------- card, steps, bars ----------
+  function setDD(id, text) { const el = $(id); el.textContent = text || "Not chosen yet"; el.classList.toggle("blank", !text); }
+  function need() {
+    const n = [];
+    if (state.start == null) n.push("a time");
+    if (!$("name").value.trim()) n.push("your name");
+    if (!$("phone").value.trim()) n.push("a mobile number");
+    return n;
+  }
+  function renderCard() {
+    const s = svc(), b = barberOf(state.barber), d = dayOf(state.dayKey);
+    const name = $("name").value.trim();
+    setDD("c-name", name);
+    setDD("c-svc", s.name);
+    setDD("c-barber", b && b.name);
+    setDD("c-day", state.start != null && `${WDL[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`);
+    setDD("c-time", state.start != null && `${fmtTime(state.start)} to ${fmtTime(state.start + s.mins)}`);
+    setDD("c-price", `$${s.price}`);
+
+    const n = need();
+    const btn = $("bookBtn");
+    btn.disabled = n.length > 0;
+    btn.textContent = state.start != null && b ? `Book ${fmtTime(state.start)} with ${b.short}` : "Book appointment";
+    $("missing").textContent = state.booked ? "" : n.length ? `Still needed: ${n.join(", ")}.` : "Everything's filled in. Pay in the shop after your cut.";
+
+    // step status
+    const done = [true, state.start != null, !!name && !!$("phone").value.trim()];
+    done.forEach((ok, i) => {
+      const st = $(`step${i + 1}`), num = $(`n${i + 1}`);
+      ok ? st.setAttribute("data-done", "") : st.removeAttribute("data-done");
+      num.innerHTML = ok ? `<span aria-hidden="true">✓</span><span class="sr">Step ${i + 1} done</span>` : `${i + 1}`;
+    });
+    $("sum1").textContent = `${s.name}, ${s.mins} min, $${s.price}`;
+    $("sum2").textContent = state.start != null ? `${b.short}, ${dayName(d)} at ${fmtTime(state.start)}` : "Not chosen yet";
+    $("sum3").textContent = done[2] ? `${name}, ${$("phone").value.trim()}` : "Name and mobile number";
+
+    // picked bar under the book
+    $("pickedBar").hidden = state.start == null || state.booked;
+    if (state.start != null) $("pickedText").textContent = `${b.short}, ${dayName(d)} at ${fmtTime(state.start)}`;
+
+    // phone bottom bar
+    $("mbarText").innerHTML = state.booked
+      ? `<b>Booked with ${b.short}</b>${dayName(d)} at ${fmtTime(state.start)}`
+      : `<b>${s.name}, $${s.price}</b>${state.start != null ? `${b.short}, ${dayName(d)} at ${fmtTime(state.start)}` : "Pick a time"}`;
+    $("mbarBtn").textContent = state.booked ? "See booking" : n.length ? (state.start == null ? "Pick a time" : "Finish booking") : "Review and book";
+    $("mbarBtn").setAttribute("href", state.start == null && !state.booked ? "#step2" : n.length && !state.booked ? "#step3" : "#summary");
+  }
+
+  function renderNext() {
+    const nx = findNext();
+    $("nextLbl").textContent = `Next open chair for a ${svc().name.toLowerCase()}`;
+    if (!nx) { $("nextWhen").textContent = "Fully booked this week"; $("takeNext").hidden = true; return; }
+    $("takeNext").hidden = false;
+    $("nextWhen").textContent = `${dayName(dayOf(nx.day)).replace(/^./, c => c.toUpperCase())} at ${fmtTime(nx.start)} with ${barberOf(nx.barber).short}`;
+    $("takeNext").onclick = () => {
+      if (state.booked) resetBooking();
+      Object.assign(state, { dayKey: nx.day, barber: nx.barber, start: nx.start, only: null });
+      renderAll();
+      $("step3").scrollIntoView();
+      $("phone").focus({ preventScroll: true });
+    };
+  }
+
+  function renderAll() { renderDays(); renderBarberChips(); renderBook(); renderCard(); renderNext(); }
+
+  // ---------- form ----------
+  ["name", "phone"].forEach(id => $(id).addEventListener("input", () => {
+    if (id === "phone") { $("f-phone").removeAttribute("data-error"); $("phoneErr").hidden = true; }
+    renderCard();
+  }));
+  $("details").addEventListener("submit", e => { e.preventDefault(); if (!$("bookBtn").disabled) $("bookBtn").click(); });
+  $("toDetails").addEventListener("click", () => setTimeout(() => $(!$("name").value.trim() ? "name" : "phone").focus({ preventScroll: true }), 0));
+
+  $("bookBtn").addEventListener("click", () => {
+    const digits = $("phone").value.replace(/\D/g, "");
+    if (digits.length < 10) {
+      $("f-phone").setAttribute("data-error", "");
+      $("phoneErr").textContent = "Enter a 10-digit mobile number so we can text your reminder.";
+      $("phoneErr").hidden = false; $("phone").focus(); return;
+    }
+    for (let i = 0; i < units(); i++) mine.add(`${state.dayKey}|${state.barber}|${state.start + i * STEP}`);
+    state.booked = true;
+    const b = barberOf(state.barber);
+    $("stamp").hidden = false; $("bookBtn").hidden = true;
+    $("doneNote").hidden = false;
+    $("doneNote").textContent = `Booked. ${b.short} will see you ${dayName(dayOf(state.dayKey))} at ${fmtTime(state.start)}. We'll text a reminder to ${$("phone").value.trim()} the evening before.`;
+    $("againBtn").hidden = false; $("againBtn").focus();
+    renderAll();
+  });
+  function resetBooking() {
+    state.booked = false; state.barber = null; state.start = null;
+    $("stamp").hidden = true; $("bookBtn").hidden = false; $("doneNote").hidden = true; $("againBtn").hidden = true;
+  }
+  $("againBtn").addEventListener("click", () => { resetBooking(); renderAll(); $("step2").scrollIntoView(); });
+
+  // ---------- barbers + visit ----------
+  $("crew").innerHTML = BARBERS.map(b => `
+    <article class="person">
+      ${avatar(b)}
+      <h3>${b.name}</h3>
+      <p class="meta">${b.years} years in the chair. ${b.tag}.</p>
+      <p>${b.bio}</p>
+      <button class="btn btn-ghost" type="button" data-see="${b.id}">See ${b.short}'s times</button>
+    </article>`).join("");
+  $("crew").addEventListener("click", e => {
+    const btn = e.target.closest("[data-see]"); if (!btn) return;
+    state.only = btn.dataset.see;
+    if (!state.booked && state.barber && state.barber !== state.only) { state.barber = null; state.start = null; }
+    renderAll();
+    $("step2").scrollIntoView();
+    $("bookWrap").focus({ preventScroll: true });
+  });
+
+  const order = [2, 3, 4, 5, 6, 0, 1];
+  const fmtH = m => { const h = Math.floor(m / 60), h12 = ((h + 11) % 12) + 1; return `${h12}${m % 60 ? ":" + pad(m % 60) : ""} ${h < 12 ? "am" : "pm"}`; };
+  $("hours").innerHTML = `<caption class="sr">Opening hours</caption>` + order.map(d => `
+    <tr ${d === today.getDay() ? "data-today" : ""}><td>${WDL[d]}</td><td>${HOURS[d] ? `${fmtH(HOURS[d][0])} to ${fmtH(HOURS[d][1])}` : "Closed"}</td></tr>`).join("");
+
+  $("copyPhone").addEventListener("click", e => {
+    const btn = e.currentTarget, done = () => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy number", 1800); };
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents($("shopPhone")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected, press copy"; };
+    try { navigator.clipboard.writeText($("shopPhone").textContent).then(done, fallback); } catch { fallback(); }
+  });
+
+  // ---------- nav highlighting + phone bar visibility ----------
+  if ("IntersectionObserver" in window) {
+    const links = [...document.querySelectorAll(".nav a[data-sec]")];
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) links.forEach(a => a.setAttribute("aria-current", a.dataset.sec === en.target.id)); });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    ["book", "barbers", "visit"].forEach(id => io.observe($(id)));
+
+    const io2 = new IntersectionObserver(([en]) => {
+      en.isIntersecting ? $("mbar").setAttribute("data-away", "") : $("mbar").removeAttribute("data-away");
+    }, { threshold: .25 });
+    io2.observe($("summary"));
+  }
+
+  // ---------- boot ----------
+  state.dayKey = keyOf(DAYS.find((d, i) => HOURS[d.getDay()] && (i > 0 || nowMin < HOURS[d.getDay()][1] - 60)));
+  renderAll();
+})();
+</script>
+</body>
+</html>
