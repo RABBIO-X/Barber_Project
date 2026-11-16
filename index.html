@@ -149,6 +149,24 @@ h1, h2, h3 { text-wrap: balance; }
 .chip:hover { border-color: var(--ink-soft); }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--tile); border-color: var(--ink); }
 .chip:disabled { opacity: .45; cursor: not-allowed; text-decoration: line-through; }
+.ahead { font-weight: 400; color: var(--ink-soft); margin-left: 8px; }
+.dayscroller { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.dayarrow {
+  width: 36px; height: 56px; border-radius: 6px; border: 1.5px solid var(--ink); background: var(--paper); color: var(--ink);
+  font: 700 1.5rem/1 var(--font-body); cursor: pointer; display: grid; place-items: center; padding: 0 0 3px;
+}
+.dayarrow:hover:not(:disabled) { background: var(--ink); color: var(--tile); }
+.dayarrow:disabled { opacity: .3; cursor: default; }
+.days-track {
+  scroll-snap-type: x proximity; scroll-padding-inline: 2px; padding-bottom: 12px;
+  scrollbar-width: auto; scrollbar-color: var(--ink-soft) var(--booked);
+}
+.days-track .day { scroll-snap-align: start; }
+.days-track::-webkit-scrollbar { height: 10px; }
+.days-track::-webkit-scrollbar-track { background: var(--booked); border-radius: 5px; }
+.days-track::-webkit-scrollbar-thumb { background: var(--ink-soft); border-radius: 5px; }
+.days-track::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+@media (max-width: 520px) { .dayarrow { width: 30px; } .ahead { display: block; margin: 2px 0 0; } }
 .day { min-width: 64px; flex-direction: column; gap: 0; text-align: center; }
 .day b { font-family: var(--font-sign); font-size: 1.6rem; font-weight: 800; }
 .day small { font-size: .76rem; opacity: .8; }
@@ -336,7 +354,14 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
 
       <section class="step" id="step2" aria-labelledby="s2">
         <div class="step-head"><span class="n" id="n2">2</span><div><h2 id="s2">Pick a barber and a time</h2><span class="sum" id="sum2"></span></div></div>
-        <div class="pickrow"><span id="dayLbl">Day</span><div class="chips" id="days" role="group" aria-labelledby="dayLbl"></div></div>
+        <div class="pickrow">
+          <span id="dayLbl">Day <small class="ahead">Book up to 2 weeks ahead</small></span>
+          <div class="dayscroller">
+            <button type="button" class="dayarrow" id="dayPrev" aria-label="Earlier days" aria-controls="days">‹</button>
+            <div class="chips days-track" id="days" role="group" aria-labelledby="dayLbl"></div>
+            <button type="button" class="dayarrow" id="dayNext" aria-label="Later days" aria-controls="days">›</button>
+          </div>
+        </div>
         <div class="pickrow"><span id="barberLbl">Barber</span><div class="chips" id="barberChips" role="group" aria-labelledby="barberLbl"></div></div>
         <p class="hint">Each column is one barber's book for the day. Tap an open time to take it. Striped times are already booked.</p>
         <div class="book-scroll" id="bookWrap" tabindex="-1"></div>
@@ -459,7 +484,8 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const nowMin = (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
-  const DAYS = Array.from({ length: 10 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return d; });
+  const BOOK_AHEAD_DAYS = 14; // today plus 14 days
+  const DAYS = Array.from({ length: BOOK_AHEAD_DAYS + 1 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return d; });
   const dayOf = k => DAYS.find(x => keyOf(x) === k);
   const dayName = d => keyOf(d) === keyOf(today) ? "today" : keyOf(d) === keyOf(DAYS[1]) ? "tomorrow" : `${WDL[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`;
 
@@ -504,7 +530,31 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
   });
 
   // ---------- day + barber pickers ----------
+  const track = $("days");
+  function updateArrows() {
+    $("dayPrev").disabled = track.scrollLeft <= 2;
+    $("dayNext").disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+  }
+  function scrollDayIntoView() {
+    const sel = track.querySelector('.day[aria-pressed="true"]'); if (!sel) return;
+    const left = sel.offsetLeft - track.offsetLeft, right = left + sel.offsetWidth;
+    if (left < track.scrollLeft) track.scrollLeft = left - 4;
+    else if (right > track.scrollLeft + track.clientWidth) track.scrollLeft = right - track.clientWidth + 4;
+  }
+  const page = dir => track.scrollBy({ left: dir * track.clientWidth * 0.8, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  $("dayPrev").addEventListener("click", () => page(-1));
+  $("dayNext").addEventListener("click", () => page(1));
+  track.addEventListener("scroll", updateArrows, { passive: true });
+  addEventListener("resize", updateArrows);
+
   function renderDays() {
+    const keep = track.scrollLeft;
+    renderDayChips();
+    track.scrollLeft = keep;
+    scrollDayIntoView();
+    updateArrows();
+  }
+  function renderDayChips() {
     $("days").innerHTML = DAYS.map((d, i) => {
       const closed = !HOURS[d.getDay()];
       const label = i === 0 ? "Today" : i === 1 ? "Tmrw" : WD[d.getDay()];
