@@ -379,9 +379,13 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
       <section class="step" id="step3" aria-labelledby="s3">
         <div class="step-head"><span class="n" id="n3">3</span><div><h2 id="s3">Tell us who's coming in</h2><span class="sum" id="sum3"></span></div></div>
         <form id="details" class="fields" novalidate>
-          <div class="field full" id="f-name">
-            <label for="name">Name</label>
-            <input id="name" name="name" autocomplete="name" value="Jordan Avery">
+          <div class="field" id="f-first">
+            <label for="firstName">First name</label>
+            <input id="firstName" name="firstName" autocomplete="given-name" value="Jordan">
+          </div>
+          <div class="field" id="f-last">
+            <label for="lastName">Last name</label>
+            <input id="lastName" name="lastName" autocomplete="family-name" value="Avery">
           </div>
           <div class="field" id="f-phone">
             <label for="phone">Mobile <small>for a text reminder</small></label>
@@ -633,14 +637,16 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
   function need() {
     const n = [];
     if (state.start == null) n.push("a time");
-    if (!$("name").value.trim()) n.push("your name");
+    if (!$("firstName").value.trim()) n.push("your first name");
+    if (!$("lastName").value.trim()) n.push("your last name");
     if (!$("phone").value.trim()) n.push("a mobile number");
     if (!$("email").value.trim()) n.push("an email address");
     return n;
   }
   function renderCard() {
     const s = svc(), b = barberOf(state.barber), d = dayOf(state.dayKey);
-    const name = $("name").value.trim();
+    const first = $("firstName").value.trim(), last = $("lastName").value.trim();
+    const name = [first, last].filter(Boolean).join(" ");
     setDD("c-name", name);
     setDD("c-svc", s.name);
     setDD("c-barber", b && b.name);
@@ -656,7 +662,7 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
 
     // step status
     const email = $("email").value.trim();
-    const done = [true, state.start != null, !!name && !!$("phone").value.trim() && !!email];
+    const done = [true, state.start != null, !!first && !!last && !!$("phone").value.trim() && !!email];
     done.forEach((ok, i) => {
       const st = $(`step${i + 1}`), num = $(`n${i + 1}`);
       ok ? st.setAttribute("data-done", "") : st.removeAttribute("data-done");
@@ -696,12 +702,12 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
   function renderAll() { renderDays(); renderBarberChips(); renderBook(); renderCard(); renderNext(); }
 
   // ---------- form ----------
-  ["name", "phone", "email"].forEach(id => $(id).addEventListener("input", () => {
-    if (id !== "name") { $(`f-${id}`).removeAttribute("data-error"); $(`${id}Err`).hidden = true; }
+  ["firstName", "lastName", "phone", "email"].forEach(id => $(id).addEventListener("input", () => {
+    if (id === "phone" || id === "email") { $(`f-${id}`).removeAttribute("data-error"); $(`${id}Err`).hidden = true; }
     renderCard();
   }));
   $("details").addEventListener("submit", e => { e.preventDefault(); if (!$("bookBtn").disabled) $("bookBtn").click(); });
-  $("toDetails").addEventListener("click", () => setTimeout(() => $(!$("name").value.trim() ? "name" : "phone").focus({ preventScroll: true }), 0));
+  $("toDetails").addEventListener("click", () => setTimeout(() => $(["firstName", "lastName", "phone", "email"].find(f => !$(f).value.trim()) || "firstName").focus({ preventScroll: true }), 0));
 
   $("bookBtn").addEventListener("click", () => {
     const digits = $("phone").value.replace(/\D/g, "");
