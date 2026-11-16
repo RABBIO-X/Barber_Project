@@ -379,7 +379,7 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
       <section class="step" id="step3" aria-labelledby="s3">
         <div class="step-head"><span class="n" id="n3">3</span><div><h2 id="s3">Tell us who's coming in</h2><span class="sum" id="sum3"></span></div></div>
         <form id="details" class="fields" novalidate>
-          <div class="field" id="f-name">
+          <div class="field full" id="f-name">
             <label for="name">Name</label>
             <input id="name" name="name" autocomplete="name" value="Jordan Avery">
           </div>
@@ -387,6 +387,11 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
             <label for="phone">Mobile <small>for a text reminder</small></label>
             <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 014-2290" aria-describedby="phoneErr">
             <span class="err" id="phoneErr" hidden></span>
+          </div>
+          <div class="field" id="f-email">
+            <label for="email">Email <small>for your confirmation</small></label>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="email" spellcheck="false" placeholder="jordan@example.com" aria-describedby="emailErr">
+            <span class="err" id="emailErr" hidden></span>
           </div>
           <div class="field full">
             <label for="note">Notes for your barber <small>optional</small></label>
@@ -630,6 +635,7 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
     if (state.start == null) n.push("a time");
     if (!$("name").value.trim()) n.push("your name");
     if (!$("phone").value.trim()) n.push("a mobile number");
+    if (!$("email").value.trim()) n.push("an email address");
     return n;
   }
   function renderCard() {
@@ -649,7 +655,8 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
     $("missing").textContent = state.booked ? "" : n.length ? `Still needed: ${n.join(", ")}.` : "Everything's filled in. Pay in the shop after your cut.";
 
     // step status
-    const done = [true, state.start != null, !!name && !!$("phone").value.trim()];
+    const email = $("email").value.trim();
+    const done = [true, state.start != null, !!name && !!$("phone").value.trim() && !!email];
     done.forEach((ok, i) => {
       const st = $(`step${i + 1}`), num = $(`n${i + 1}`);
       ok ? st.setAttribute("data-done", "") : st.removeAttribute("data-done");
@@ -657,7 +664,7 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
     });
     $("sum1").textContent = `${s.name}, ${s.mins} min, $${s.price}`;
     $("sum2").textContent = state.start != null ? `${b.short}, ${dayName(d)} at ${fmtTime(state.start)}` : "Not chosen yet";
-    $("sum3").textContent = done[2] ? `${name}, ${$("phone").value.trim()}` : "Name and mobile number";
+    $("sum3").textContent = done[2] ? `${name}, ${$("phone").value.trim()}, ${email}` : "Name, mobile number and email";
 
     // picked bar under the book
     $("pickedBar").hidden = state.start == null || state.booked;
@@ -689,8 +696,8 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
   function renderAll() { renderDays(); renderBarberChips(); renderBook(); renderCard(); renderNext(); }
 
   // ---------- form ----------
-  ["name", "phone"].forEach(id => $(id).addEventListener("input", () => {
-    if (id === "phone") { $("f-phone").removeAttribute("data-error"); $("phoneErr").hidden = true; }
+  ["name", "phone", "email"].forEach(id => $(id).addEventListener("input", () => {
+    if (id !== "name") { $(`f-${id}`).removeAttribute("data-error"); $(`${id}Err`).hidden = true; }
     renderCard();
   }));
   $("details").addEventListener("submit", e => { e.preventDefault(); if (!$("bookBtn").disabled) $("bookBtn").click(); });
@@ -703,12 +710,18 @@ footer { padding-block: 24px 40px; color: var(--ink-soft); font-size: .85rem; bo
       $("phoneErr").textContent = "Enter a 10-digit mobile number so we can text your reminder.";
       $("phoneErr").hidden = false; $("phone").focus(); return;
     }
+    const email = $("email").value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      $("f-email").setAttribute("data-error", "");
+      $("emailErr").textContent = "Enter an email like name@example.com so we can send your confirmation.";
+      $("emailErr").hidden = false; $("email").focus(); return;
+    }
     for (let i = 0; i < units(); i++) mine.add(`${state.dayKey}|${state.barber}|${state.start + i * STEP}`);
     state.booked = true;
     const b = barberOf(state.barber);
     $("stamp").hidden = false; $("bookBtn").hidden = true;
     $("doneNote").hidden = false;
-    $("doneNote").textContent = `Booked. ${b.short} will see you ${dayName(dayOf(state.dayKey))} at ${fmtTime(state.start)}. We'll text a reminder to ${$("phone").value.trim()} the evening before.`;
+    $("doneNote").textContent = `Booked. ${b.short} will see you ${dayName(dayOf(state.dayKey))} at ${fmtTime(state.start)}. A confirmation goes to ${email}, and we'll text a reminder to ${$("phone").value.trim()} the evening before.`;
     $("againBtn").hidden = false; $("againBtn").focus();
     renderAll();
   });
