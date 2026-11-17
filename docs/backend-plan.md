@@ -30,7 +30,7 @@ Fresha and Booksy were also considered. They have built-in payments and director
 
 ```
 Booking page ──fetch──► server functions (hold the Square key)
-                            ├── GET  /api/services      Square's service list: names, lengths, prices (per barber if used)
+                            ├── GET  /api/services      Square's service list: names, lengths, one price each, and which barbers offer it
                             ├── GET  /api/availability  Square's free times for a service, day and barber
                             └── POST /api/bookings      Create the booking in Square (and the customer if they're new)
 ```
@@ -40,20 +40,18 @@ Booking page ──fetch──► server functions (hold the Square key)
 - **The customer is charged Square's current price.** The page should re-check the price before confirming, and tell the customer if it changed since they opened the page.
 - **Messages:** Square sends confirmations and reminders, which replaces the promises the page currently makes but doesn't keep.
 
-### Prices per barber
+### Account setup and pricing (decided 2026-11-16)
 
-Which setup to use depends on how the shop is run:
+- **The barbers work for the shop.** There is **one Square account** for the shop, and each barber is a team member on it. Payments go to the shop, which pays the barbers.
+- **One price per service, whatever the barber.** A skin fade costs the same with Dee, Marco or Sam. Prices aren't set per barber in Square, and the front end keeps showing one price per service.
+- **Who changes prices:** the owner or a manager, in the Square Dashboard. Barbers don't need permission to edit services.
+- **Assigning services:** each service is assigned to the barbers who offer it. That decides which columns can take a booking for it, not its price.
 
-- **Barbers who work for the shop:** one Square account, with a default price per service and a different price and length for each barber where needed. The owner or a manager edits prices.
-- **Barbers who rent their chairs:** each barber has their own Square account with their own prices and payouts. A combined page then has to read from several accounts, with each barber's permission.
-
-**Still to decide:** which of these the shop is.
-
-If prices per barber are used, the front end should show "from $X" in the service list, each barber's price at the top of their column, and the chosen barber's price on the appointment card.
+Prices per barber were considered and turned down. If the shop ever wants them, Square can set a price for each barber on the same account, and the front end would then need "from $X" prices.
 
 ### Check before building
 
-Feature details and fees here come from general knowledge, not a check of Square's current documentation. Before building, check Square's current plans (which tier includes prices per barber), its fees, and what's available in the shop's country.
+Feature details and fees here come from general knowledge, not a check of Square's current documentation. Before building, check Square's current plans (which tier the shop needs for three team members), its fees, and what's available in the shop's country.
 
 ## Front-end changes to prepare
 

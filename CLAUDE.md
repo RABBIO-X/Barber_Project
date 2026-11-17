@@ -6,7 +6,7 @@ Guidance for Claude Code when working in this repository.
 
 A static booking front end for **Kettle Street Barbers**, a fictional three-chair barbershop. It's live on GitHub Pages at https://rabbio-x.github.io/Barber_Project/. Every push to `main` redeploys it within a minute or two.
 
-There is **no backend yet**. Bookings exist only in the visitor's browser and disappear when the page reloads. The chosen direction for the backend is Square Appointments; see `docs/backend-plan.md`.
+There is **no backend yet**. Bookings exist only in the visitor's browser and disappear when the page reloads. The chosen direction for the backend is Square Appointments: one shop account with the barbers as team members, and one price per service. See `docs/backend-plan.md`.
 
 ## Layout
 
@@ -35,7 +35,7 @@ Data constants sit at the top of the `<script>` block:
 
 | Constant | Meaning |
 |---|---|
-| `SERVICES` | `{ id, name, note, mins, price }`. Price is the same for every barber (for now). |
+| `SERVICES` | `{ id, name, note, mins, price }`. One price per service, the same for every barber. This is a business decision, not a shortcut: don't add prices per barber. |
 | `BARBERS` | `{ id, photo, name, short, tag, years, bio }`. Without `photo`, the barber's initials show. |
 | `HOURS` | Opening hours keyed by weekday (`0` = Sunday), as `[openMin, closeMin]` in minutes from midnight. `null` means closed (Monday). |
 | `STEP` | Length of one slot in the times table, in minutes (30). |
