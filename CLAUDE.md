@@ -36,7 +36,7 @@ Data constants sit at the top of the `<script>` block:
 | Constant | Meaning |
 |---|---|
 | `SERVICES` | `{ id, name, note, mins, price }`. One price per service, the same for every barber. This is a business decision, not a shortcut: don't add prices per barber. |
-| `BARBERS` | `{ id, photo, name, short, tag, years, bio }`. Without `photo`, the barber's initials show. |
+| `BARBERS` | `{ id, photo, name, short, tag, years, bio }`. Without `photo`, the barber's initials show. **Temporary stand-in:** profiles (photo, name, experience, working hours) will come from `GET /api/barbers`. See "Barber profiles come from the backend" in `docs/backend-plan.md`. |
 | `HOURS` | Opening hours keyed by weekday (`0` = Sunday), as `[openMin, closeMin]` in minutes from midnight. `null` means closed (Monday). |
 | `STEP` | Length of one slot in the times table, in minutes (30). |
 | `BOOK_AHEAD_DAYS` | How far ahead people can book (14). The day picker shows today plus this many days. |

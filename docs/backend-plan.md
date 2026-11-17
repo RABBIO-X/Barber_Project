@@ -30,6 +30,7 @@ Fresha and Booksy were also considered. They have built-in payments and director
 
 ```
 Booking page ──fetch──► server functions (hold the Square key)
+                            ├── GET  /api/barbers       Barber profiles: photo, name, experience, working hours
                             ├── GET  /api/services      Square's service list: names, lengths, one price each, and which barbers offer it
                             ├── GET  /api/availability  Square's free times for a service, day and barber
                             └── POST /api/bookings      Create the booking in Square (and the customer if they're new)
@@ -47,6 +48,51 @@ Booking page ──fetch──► server functions (hold the Square key)
 - **Who changes prices:** the owner or a manager, in the Square Dashboard. Barbers don't need permission to edit services.
 - **Assigning services:** each service is assigned to the barbers who offer it. That decides which columns can take a booking for it, not its price.
 
+### Barber profiles come from the backend (decided 2026-11-16)
+
+The page won't hard-code barbers any more. It loads them from `GET /api/barbers` on page load and builds the barber filter, the times-table columns and the Barbers section from that list. Adding, removing or editing a barber then needs no change to the site.
+
+Each profile has:
+
+| Field | Shown as | Where it comes from |
+|---|---|---|
+| `id` | Not shown; links the profile to bookings | The barber's Square team member ID |
+| `name`, `shortName` | "Dee Okafor", and "Dee" in buttons and column headings | The display name on the barber's Square booking profile |
+| `photo` | Round portrait (header of their column, filter button, Barbers section) | The photo on the barber's Square booking profile if one is set, otherwise an image the shop uploads. If there's none, the page shows initials. |
+| `experience` | "12 years in the chair" | Store the **year they started** (for example `2014`), not a number of years, so it stays right every year. The server works out the years. Square has no field for this, so it's kept in the shop's own small settings store next to the Square team member ID. |
+| `specialty`, `bio` | "Fades", and the short paragraph in the Barbers section | The description on the Square booking profile, or the shop's settings store |
+| `availability` | Which days and hours the barber works, and whether they can be booked online at all | Their Square booking setup: working hours, days off, and whether they're bookable online |
+
+Example response:
+
+```json
+[
+  {
+    "id": "TMa1b2c3",
+    "name": "Dee Okafor",
+    "shortName": "Dee",
+    "photo": "https://…/dee.jpg",
+    "startedYear": 2014,
+    "experienceYears": 12,
+    "specialty": "Fades",
+    "bio": "Skin fades, tapers and sharp line-ups. Bring a photo of the cut you want.",
+    "bookable": true,
+    "workingHours": { "2": [[540, 1140]], "3": [[540, 1140]], "6": [[480, 960]] }
+  }
+]
+```
+
+`workingHours` uses the same format as the page's `HOURS` constant: weekday (`0` = Sunday) to a list of `[startMin, endMin]` blocks, so a lunch break is two blocks.
+
+**Working hours and free times are separate.** A barber's working hours say when they're in the shop. Which of those times are still free comes from `GET /api/availability`, which asks Square for its open times. The page uses working hours to grey out days a barber is off ("Dee is off on Sundays"), and availability for the times table.
+
+**Rules for the page:**
+- Only show barbers marked `bookable`. Someone on holiday or not taking online bookings is hidden from the filter and the times table, but can stay in the Barbers section.
+- If the profile list fails to load, show a clear message with a retry button. Don't fall back to made-up barbers.
+- Keep a copy of the list for a few minutes; profiles change rarely.
+
+**Check before building:** from general knowledge, Square's booking profiles hold a display name, description and photo, and Square can return a barber's free times. How each barber's regular working hours can be read through Square's developer tools needs confirming. If they can't be, keep them in the shop's settings store alongside the start year.
+
 Prices per barber were considered and turned down. If the shop ever wants them, Square can set a price for each barber on the same account, and the front end would then need "from $X" prices.
 
 ### Check before building
@@ -55,7 +101,8 @@ Feature details and fees here come from general knowledge, not a check of Square
 
 ## Front-end changes to prepare
 
-1. Replace the hard-coded `SERVICES`, `BARBERS` and `HOURS` with a single loader that reads from a data source. Use the current constants as a local stand-in until the API exists.
-2. Replace the fake `isTaken` hash with data from `/api/availability`.
-3. Make the booking button send to `/api/bookings`. Handle "that time was just taken" by refreshing the times table and showing a clear message.
-4. Add loading and error states to the times table.
+1. Replace the hard-coded `SERVICES`, `BARBERS` and `HOURS` with a single loader that reads from a data source. Use the current constants as a local stand-in until the API exists. `BARBERS` should take the `/api/barbers` shape above (`startedYear`, `workingHours`, `bookable`).
+2. Build the barber filter, times-table columns and Barbers section from the loaded list, and grey out times outside each barber's working hours.
+3. Replace the fake `isTaken` hash with data from `/api/availability`.
+4. Make the booking button send to `/api/bookings`. Handle "that time was just taken" by refreshing the times table and showing a clear message.
+5. Add loading and error states to the times table.
